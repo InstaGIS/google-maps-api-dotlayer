@@ -13,7 +13,7 @@ It has dependencies on
 * [Dat.GUI](https://code.google.com/p/dat-gui/)
 * [Require.js](http://requirejs.org/)
 
-== What does it do?
+== What does it do? ==
 
 DotLayer provides yet another visualization to print the contents of a DataSet to your google map. By DataSet I mean any kind of collection you are using to store your data. Some people uses the google.maps.MVCArray object, which can be filled with plain objects, or perhaps MVCObject objects, others might use the google.maps.Data object to store a collection of google.maps.Data.Feature objects. There are many ways to manage a DataSet so I won't go into that.
 
@@ -21,7 +21,7 @@ Provided that your DataSet is a collection of objects, and each of these objects
 
 If your collection has a *loadPoints* method, then DotLayer will invoke it to fill its canvas with the sprites that method return. If it doesn't, then it will iterate over the collection to print just the points that are actually in it when you call the constructor.
 
-== Why so?
+== Why so? ==
 
 Imagine you have a DataSet that represents people. People in a block can add easily up to 3000 or 5000. Creating a google.maps.Marker for each one will render your browser slow or even unresponsive. In my projects, we set a limit on the maximum Markers you can pull from the DB to protect the user from *accidentally* zooming out and drawing hundreds of thousands of markers.
 
@@ -36,12 +36,12 @@ Ubilab's solution was smooth, but didn't resolve the general case. It wasn't abl
 Using threejs materials allows you to texturize it with millions of points. Of course, you might not have those points in memory, and that's where the *loadPoints* method comes in. You pass only a reference of your DataSet and DotLayer will request the points from your backend using your implemented method.
 
 
-== Controls
+== Controls ==
 
 Also inspired by Ubilabs's use of the fantastic dat.GUI library, I added a method to create a control box in which you can change the color, size and opacity of your markers.
 
 
-== Caveats
+== Caveats ==
 
 Unlike google.maps.Marker, this marker-shaped material is just an overlay. You can't add individual click listeners to the dots. We mean to print massive amounts of dots, so there would be no point in carrying individual analysis even if it was possible. This being said, DotLayer is not a replacement for google.maps.Marker, but instead another visualization choice to show sheer volume.
 
