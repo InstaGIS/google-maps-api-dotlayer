@@ -13,6 +13,9 @@ It has dependencies on
 * [Dat.GUI](https://code.google.com/p/dat-gui/)
 * [Require.js](http://requirejs.org/)
 
+
+**Whant to try it out? [Here's a demo!](http://amenadiel.github.io/google-maps-api-dotlayer/dotlayer_demo.html)**
+
 == What does it do? ==
 
 DotLayer provides yet another visualization to print the contents of a DataSet to your google map. By DataSet I mean any kind of collection you are using to store your data. Some people uses the google.maps.MVCArray object, which can be filled with plain objects, or perhaps MVCObject objects, others might use the google.maps.Data object to store a collection of google.maps.Data.Feature objects. There are many ways to manage a DataSet so I won't go into that.
