@@ -18,11 +18,33 @@ It has dependencies on
 
 ## What does it do? 
 
-DotLayer provides yet another visualization to print the contents of a DataSet to your google map. By DataSet I mean any kind of collection you are using to store your data. Some people uses the google.maps.MVCArray object, which can be filled with plain objects, or perhaps MVCObject objects, others might use the google.maps.Data object to store a collection of google.maps.Data.Feature objects. There are many ways to manage a DataSet so I won't go into that.
+DotLayer provides yet another visualization to print the contents of a DataSet to your google map. By DataSet I mean any kind of collection you are using to store your data. I've seen different kind of collection for this:
+* DataSet is a *google.maps.MVCArray* object, and each element is a position i.e. google.maps.LatLng object
+* DataSet is a *google.maps.MVCArray* object, each element is an plain object, whose position property is a google.maps.LatLng object.
+* DataSet is a *google.maps.MVCArray* object, each element is a google.maps.MVCObject whose position property is a google.maps.LatLng object.
+* DataSet is a *google.maps.Data* object, each element is a google.maps.Data.Feature whose geometry has a position or centroid.
+* Third party Collections such as Backbone's filled with whatever you want.
 
+There are many ways to manage a DataSet, but all in all DotLayer doesn't care about that. Instead, your dataset must implement a *loadPoints* method, whose purpose is to create a plain array made of google.maps.LatLng elements. Depending on the structure of your DataSet, your *loadPoints* method may vary. The *loadPoints* method should take a callback parameter, which should be called with the plain array as argument.
+
+Example: let's imagine your DataSet is an MVCArray and each element is a google.maps.Marker element.
+
+```js
+DataSet.loadPoints = function(callback) {
+		var origin = [];
+		this.forEach(function(element) {
+			var position;
+			position = element.get('position');
+			origin.push(position);
+		});
+		if (callback) callback(origin);
+	};
+
+```
 Provided that your DataSet is a collection of objects, and each of these objects has its position and or coordinates, DotLayer will print on the map an overlay with a marker-shaped sprite for each position in your collection.
 
-If your collection has a *loadPoints* method, then DotLayer will invoke it to fill its canvas with the sprites that method return. If it doesn't, then it will iterate over the collection to print just the points that are actually in it when you call the constructor.
+If your collection doesn't have a  *loadPoints* method, then DotLayer will try to extract the position of each element in the collection. It might fail and it'll be your fault. I guarantee it.
+
 
 ## Installation and Usage
 
