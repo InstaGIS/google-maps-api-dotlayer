@@ -31,8 +31,8 @@ requirejs.config({
   waitSeconds: 16,
   baseUrl: './js/lib',
   paths: {
-  app: '../app',
-  jquery: 'http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min',
+  'jquery': 'http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min',
+  'dotlayer': '/google-maps-api-dotlayer/js/app/models/dotlayer'
   },
 });    
 
@@ -1097,7 +1097,7 @@ function initialize() {
   }
 
   function createDotlayer() {
-    require( ["jquery", "app/models/dotlayer"],   function(jQuery, DotLayer) {
+    require( ["jquery", "dotlayer"],   function(jQuery, DotLayer) {
     heatmap.setMap(null);
     var dotlayer = new google.maps.DotLayer({
         map: map,
