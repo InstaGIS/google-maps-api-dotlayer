@@ -41,12 +41,12 @@ var sampleData = [
   new google.maps.LatLng(37.782992, -122.442112),
   new google.maps.LatLng(37.765166, -122.43503)
 ];
-  var pointArray = new google.maps.MVCArray(taxiData);
+  var DataSet = new google.maps.MVCArray(sampleData);
 var dotlayer = new google.maps.DotLayer({
 				map: map,
 				container: '#dotlayer_controls',
 				controlbox: true,
-				DataSet: sampleData
+				DataSet: DataSet
 			});
 		}
 
