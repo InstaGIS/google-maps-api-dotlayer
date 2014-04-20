@@ -25,14 +25,16 @@
     }
   </style>
   <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=visualization"></script>
-  <script src="/google-maps-api-dotlayer/js/lib/require.js"></script>
+  <script src="http://amenadiel.github.io/google-maps-api-dotlayer/js/lib/require.js"></script>
   <script>
 requirejs.config({
   waitSeconds: 16,
   baseUrl: './js/lib',
   paths: {
   'jquery': 'http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min',
-  'dotlayer': '/google-maps-api-dotlayer/js/app/models/dotlayer'
+  'dotlayer': 'http://amenadiel.github.io/google-maps-api-dotlayer/dotlayer',
+  'three': 'http://amenadiel.github.io/google-maps-api-dotlayer/js/lib/three',
+  'dat.gui': 'http://amenadiel.github.io/google-maps-api-dotlayer/js/lib/dat.gui'
   },
 });    
 
