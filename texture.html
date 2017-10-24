@@ -1,0 +1,227 @@
+    <html>
+	<head>
+		<title>PROYECTO 1 - Daniel Ramos C.I. 26.237.178</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="lib/build.three.js"></script>
+		<script src="lib/OrbitControls.js"></script>
+		<script src="lib/dat.gui.min.js"></script>
+		<script>
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 100000 );
+
+			//Cambiando el color del fondo
+			scene.background = new THREE.Color(0x000000);
+
+			//Escala de X
+			var xnScale = 0;
+			var xpScale = 6000;
+
+			//Escala de Y
+			var ynScale = 0;
+			var ypScale = 3000;
+
+			//Escala de Z
+			var znScale = 0;
+			var zpScale = 3000;
+
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			var xValues = [],
+			yValues = [],
+			zValues = [],
+			colors=[];
+			for ( var i = 0; i < 500; i ++ ) {
+				xValues.push(( Math.random() - 0.5 ) * 1000);
+				yValues.push(( Math.random() - 0.5 ) * 1000);
+				zValues.push(( Math.random() - 0.5 ) * 1000),
+				colors.push( new THREE.Color( parseInt(Math.random()*255,10), parseInt(Math.random()*255,10), parseInt(Math.random()*255,10) ));
+				colors.push( new THREE.Color( parseInt(Math.random()*255,10), parseInt(Math.random()*255,10), parseInt(Math.random()*255,10) ));
+				colors.push( new THREE.Color( parseInt(Math.random()*255,10), parseInt(Math.random()*255,10), parseInt(Math.random()*255,10) ));
+			}
+				colors.push( new THREE.Color( parseInt(Math.random()*255,10), parseInt(Math.random()*255,10), parseInt(Math.random()*255,10) ));
+				colors.push( new THREE.Color( parseInt(Math.random()*255,10), parseInt(Math.random()*255,10), parseInt(Math.random()*255,10) ));
+				colors.push( new THREE.Color( parseInt(Math.random()*255,10), parseInt(Math.random()*255,10), parseInt(Math.random()*255,10) ));
+
+				console.log(colors);
+
+			//Buscando XMIN
+			var xMin = Math.min.apply(null, xValues);
+			//Buscando XMAX
+			var xMax = Math.max.apply(null, xValues);
+			
+			//Buscando YMin
+			var yMin = Math.min.apply(null, yValues);
+			//Buscando YMax
+			var yMax = Math.max.apply(null, yValues);
+			
+			//Buscando ZMin
+			var zMin = Math.min.apply(null, zValues);
+			//Buscando ZMax
+			var zMax = Math.max.apply(null, zValues);
+
+			//Divisiones de X
+			var xnDiv = (xpScale - xnScale)/(xMax - xMin);
+			//Divisiones de Y
+			var ynDiv = (ypScale - ynScale)/(yMax - yMin);
+			//Divisiones de Z
+			var znDiv = (zpScale - znScale)/(zMax - zMin);
+
+			//Calculando las X para visualización (Valores en pantalla)
+			var xsValues = new Array();
+			for(var i = 0; i < xValues.length; i++) {
+				xsValues.push(((xValues[i] - xMin) * xnDiv + xnScale));
+			}
+
+			//Calculando las Y para visualización (Valores en pantalla)
+			var ysValues = new Array();
+			for(var i = 0; i < yValues.length; i++) {
+				ysValues.push(((yValues[i] - yMin) * ynDiv + ynScale));
+			}
+
+			//Calculando las Z para visualización (Valores en pantalla)
+			var zsValues = new Array();
+			for(var i = 0; i < zValues.length; i++) {
+				zsValues.push(((zValues[i] - zMin) * znDiv + znScale));
+			}
+
+			//Guardando todos los puntos
+			var allPoints = [];
+
+			//Juntando los puntos para modelar la figura (vertices).
+			for(var i = 0, p = 0; i < zsValues.length; p++) {
+				for(var h = 0; h < xsValues.length; h++, i++) {
+					allPoints.push(new THREE.Vector3(xsValues[p], ysValues[h], zsValues[i]));
+				}
+			}
+
+			//Geometria
+			var geometry = new THREE.Geometry();
+			
+			//Vertices de la geometría
+			for(var i = 0; i < allPoints.length; i++) {
+				geometry.vertices.push(allPoints[i]);
+			}
+
+			/*text = {
+                Funcion_1: defaults.zFunction,
+                graficar: function() { createGraph() },
+                estado: false,
+                eliminar: function() { deleteGraph()},
+                ayuda: function(){ help()},
+                reiniciar: function(){ reloadGraph()}
+            };*/
+               
+                    
+            //gui = new dat.GUI();
+            //gui.add(text, 'HOLA');
+            
+			//Construyendo las caras
+			for(var i = 0, p = 99; i < allPoints.length - xsValues.length; i++) {
+				
+				if(i == p) {
+					p += 100;
+					continue;
+				}
+
+				geometry.faces.push(new THREE.Face3(i, i + xsValues.length, i + xsValues.length + 1));
+				
+				geometry.faces[geometry.faces.length - 1].vertexColors[0] = colors[i];
+				geometry.faces[geometry.faces.length - 1].vertexColors[1] = colors[i + ysValues.length];
+				geometry.faces[geometry.faces.length - 1].vertexColors[2] = colors[i + ysValues.length + 1];
+			
+				geometry.faces.push(new THREE.Face3(i , i + 1 , i + xsValues.length + 1));
+			
+				geometry.faces[geometry.faces.length - 1].vertexColors[0] = colors[i];
+				geometry.faces[geometry.faces.length - 1].vertexColors[1] = colors[i + 1];
+				geometry.faces[geometry.faces.length - 1].vertexColors[2] = colors[i + ysValues.length + 1];
+			}
+
+			//Material
+			var material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, 
+														 vertexColors: THREE.VertexColors,
+														 wireframe: false });
+			//vertexColors: THREE.VertexColors
+
+			//Mesh
+			var mesh = new THREE.Mesh(geometry, material);
+
+			//Añadiendo la geometría al mundo
+			scene.add(mesh);
+
+
+			//Dibujando los ejes (en forma de malla)
+
+			var xgMin = Math.min.apply(null, xsValues);
+			var xgMax = Math.max.apply(null, xsValues);
+
+			var ygMin = Math.min.apply(null, ysValues);
+			var ygMax = Math.max.apply(null, ysValues);
+
+			var zgMin = Math.min.apply(null, zsValues);
+			var zgMax = Math.max.apply(null, zsValues);
+
+			var extra = 1000;
+			var decrement = 650;
+
+			//Lineas horizontales (Ejes X y Z)
+			paintLine([new THREE.Vector3(xgMin - extra, ygMin - extra, zgMin - extra), new THREE.Vector3(xgMax + extra, ygMin - extra, zgMin - extra)]);
+
+			for(var i = ygMax + extra; i > ygMin - extra; i -= decrement) {
+				paintLine([new THREE.Vector3(xgMin - extra, i, zgMin - extra), new THREE.Vector3(xgMax + extra, i, zgMin - extra)]);
+				//Lineas frontales - horizontales
+				paintLine([new THREE.Vector3(xgMin - extra, i, zgMin - extra), new THREE.Vector3(xgMin - extra, i, zgMax + extra)]);
+			}
+
+			//Lineas verticales (Eje Y)
+
+			paintLine([new THREE.Vector3(xgMin - extra, ygMin - extra, zgMin - extra), new THREE.Vector3(xgMin - extra,ygMax + extra, zgMin - extra)]);
+
+			for(var i = xgMax + extra; i > xgMin - extra; i -= decrement) {
+				paintLine([new THREE.Vector3(i, ygMin - extra, zgMin - extra), new THREE.Vector3(i,ygMax + extra, zgMin - extra)])
+			}
+
+			//Lineas frontales (Lineas verticales del eje Z)
+			paintLine([new THREE.Vector3(xgMin - extra, ygMin - extra, zgMin - extra), new THREE.Vector3(xgMin - extra, ygMin - extra, zgMax + extra)]);
+
+			for(var i = zgMax + extra; i > zgMin - extra; i -= decrement) {
+				paintLine([new THREE.Vector3(xgMin - extra, ygMin - extra, i), new THREE.Vector3(xgMin - extra, ygMax + extra, i)]);
+			}
+
+			//Funcion que genera una linea pasando dos puntos de la misma como parametros
+			
+			function paintLine(points) {
+				var curve = new THREE.SplineCurve3(points);
+
+				var geometry = new THREE.Geometry();
+				geometry.vertices = curve.getPoints(50);
+
+				var material = new THREE.LineBasicMaterial({ color : 0x000000 });
+
+				var lineObject = new THREE.Line(geometry, material);
+
+				scene.add(lineObject);
+			}
+			
+			//Controles
+			controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+			//Posicionando camara
+			camera.position.set(1500, 1000, 3000);
+
+			var render = function () {
+				requestAnimationFrame( render );
+
+				renderer.render(scene, camera);
+			};
+
+			render();
+		</script>
+	</body>
+</html>

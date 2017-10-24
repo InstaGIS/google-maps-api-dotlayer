@@ -1,249 +1,221 @@
 <!DOCTYPE html>
 <html>
-	<head>
-	<meta charset="utf-8">
-	<title>DotLayer Demo</title>
-	<style>
-		html, body, #map-canvas {
-		height: 700px;
-		margin: 0px auto;
-		padding: 0px;
-		}
-		 
-		}
-	</style>
-	<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 
-<!-- Optional theme -->
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
-	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=visualization&key=AIzaSyCsQ6i68i9hQ90ic34cSdnROS_WcMCVksM"></script>
-	<script src="http://huasofoundries.github.io/google-maps-api-dotlayer/js/lib/require.js"></script>
-	<script>
-		
-requirejs.config({
-	waitSeconds: 16,
-	baseUrl: './js/lib',
-	paths: {
-		'jquery': 'http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min',
-		'dotlayer': '../../dotlayer',
-		'three': 'http://huasofoundries.github.io/google-maps-api-dotlayer/js/lib/three',
-		'dat.gui': 'http://huasofoundries.github.io/google-maps-api-dotlayer/js/lib/dat.gui'
-	},
-});    
+<head>
+    <meta charset="utf-8">
+    <title>DotLayer Demo</title>
+    <style>
+    html,
+    body,
+    #map-canvas {
+        height: 700px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0;
+    }
+    </style>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&key=AIzaSyAvBQ1Q9FjYfxdWJF6KPmO822RMMbY2w2o"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="lib/three.js"></script>
+    <script src="lib/dat.gui.min.js"></script>
+    <script>
+    var mymap,
+        heatmap,
+        dotlayer,
+        pointArray = new google.maps.MVCArray();
 
 
 
-var mymap,  
-	heatmap,
-	dotlayer,
- 	pointArray = new google.maps.MVCArray();
+    function initialize() {
+        var mapOptions = {
+            zoom: 13,
+            center: new google.maps.LatLng(37.774546, -122.433523),
+            mapTypeId: google.maps.MapTypeId.SATELLITE
+        };
+
+        mymap = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+        google.maps.event.addListener(mymap, 'idle', function() {
+            console.log('mapped up and good to go');
+            // Generate a desired boundary in the center ninth of the map
 
 
-	
-function initialize() {
-	var mapOptions = {
-		zoom: 13,
-		center: new google.maps.LatLng(37.774546, -122.433523),
-		mapTypeId: google.maps.MapTypeId.SATELLITE
-		};
+        });
 
-		mymap = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-		google.maps.event.addListener(mymap, 'idle', function () { 
-			console.log('mapped up and good to go');
-			// Generate a desired boundary in the center ninth of the map
-			
-			
-	});	
-		
-}
-	function generatePoints() {
-		var pointquantity=document.getElementById('pointquantity').value;
-		
-		var desiredboundary = {};
-			desiredboundary.lngdif = mymap.getBounds().getNorthEast().lng() - mymap.getBounds().getSouthWest().lng();
-			desiredboundary.latdif = mymap.getBounds().getNorthEast().lat() - mymap.getBounds().getSouthWest().lat();
-			desiredboundary.latmin=mymap.getBounds().getSouthWest().lat() + desiredboundary.latdif/3
-			desiredboundary.lngmin= mymap.getBounds().getSouthWest().lng() + desiredboundary.lngdif/3
+    }
 
-			
-			for (var repetition = 0; repetition < pointquantity; repetition++) {
-				var randomlat=desiredboundary.latmin + 1*desiredboundary.latdif * Math.random()/3,
-				randomlng=desiredboundary.lngmin + 1*desiredboundary.lngdif * Math.random()/3;
+    function createDotlayer() {
+        if (dotlayer && dotlayer instanceof google.maps.DotLayer) {
+            dotlayer.setMap(dotlayer.getMap() ? null : mymap);
+        } else {
+            console.log(dotlayer, 'not constructed');
 
-				pointArray.push(new google.maps.LatLng(randomlat,randomlng ));
-			}
-			document.getElementById('message').innerHTML='Generated '+pointquantity+' random points.';
-	}
-	
-	function toggleHeatmap() {
-		if(heatmap && heatmap.constructor===google.maps.visualization.HeatmapLayer) {
-			heatmap.setMap(heatmap.getMap() ? null : mymap);	
-		} else {
-			heatmap = new google.maps.visualization.HeatmapLayer({
-				data: pointArray,
-				map: mymap
-			});
-		}
-		
-	}
+            dotlayer = new google.maps.DotLayer({
+                map: mymap,
+                container: '#dotlayer_controls',
+                controlbox: true,
+                DataSet: pointArray
+            });
+            jQuery('#dotlayer_msg').fadeIn('slow').html('<p>&nbsp;</p><p>Go ahead. Zoom and play with the controls!</p>');
 
-	function createDotlayer() {
-		if(dotlayer && dotlayer instanceof google.maps.DotLayer) {
-			dotlayer.setMap(dotlayer.getMap() ? null : mymap);	
-		} else {
-			console.log(dotlayer,'not constructed');
-			require( ["jquery", "dotlayer"],   function(jQuery, DotLayer) {
-				heatmap && heatmap.setMap(null);
-				dotlayer = new google.maps.DotLayer({
-					map: mymap,
-					container: '#dotlayer_controls',
-					controlbox: true,
-					DataSet: pointArray
-				});
-				jQuery('#dotlayer_msg').fadeIn('slow').html('<p>&nbsp;</p><p>Go ahead. Zoom and play with the controls!</p>');
-			});
-		}
-	}
+        }
+    }
 
-google.maps.event.addDomListener(window, 'load', initialize);
+    function generatePoints() {
+        var pointquantity = document.getElementById('pointquantity').value;
 
-	</script>
+        var desiredboundary = {};
+        desiredboundary.lngdif = mymap.getBounds().getNorthEast().lng() - mymap.getBounds().getSouthWest().lng();
+        desiredboundary.latdif = mymap.getBounds().getNorthEast().lat() - mymap.getBounds().getSouthWest().lat();
+        desiredboundary.latmin = mymap.getBounds().getSouthWest().lat() + desiredboundary.latdif / 3
+        desiredboundary.lngmin = mymap.getBounds().getSouthWest().lng() + desiredboundary.lngdif / 3
 
- 
-	</head>
 
-	<body>
-	<div class="container-fluid">
-		<div class="row">
-			<h4>This map shows how to use DotLayer to display N random points. A heatmap visualization is provided as well in order to compare render speed (<a href="https://developers.google.com/maps/documentation/javascript/examples/layer-heatmap?hl=es">Google's Heatmap Demo</a>)</h4>
-		</div>
-		<div class="row">
-			<form class="col-md-2 form-horizontal" role="form" style="padding:20px;">
-	  			<div class="form-group">
-					<b>1.- Chose Point quantity: </b>
-						<div class="input-group">
-				      		<input type="text" id="pointquantity" class="form-control" value="1000">
-							<span class="input-group-btn">
-								<button class="btn btn-default"  onclick="generatePoints()" type="button">Go!</button>
-							</span>
-						</div>
-					
-					</form>
-					<p><b>2.- Chose representation method </b></p>
-					<p><label>Heatmap <button class="btn btn-default" onclick="toggleHeatmap()" type="button">Toggle Heatmap</button></label></p>
-					<p><label>Dot Layer <button class="btn btn-default"  onclick="createDotlayer()" type="button">Toggle Dotlayer</button></label></p>
- 				<div id="message"></div>
-					
-					<div id="dotlayer_controls"></div>
-					<div id="dotlayer_msg"></div>
-				</div>
-  			
-			<div class="col-md-10">
-		  			<div id="map-canvas"></div>
-			</div>
-		</div>
-		
-		<div class="row">&nbsp;</div>
-		<div class="row">
-			<div class="col-md-1"></div>
-			<div class="col-md-10">
-				<pre style="border:1px solid #CCC;background:'#F0F0F0';padding:2px">
-&lt;script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=visualization"&gt; &lt;/script&gt;
-&lt;script src="/js/lib/require.js"&gt; &lt;/script&gt;
-&lt;script>
-requirejs.config({
-	waitSeconds: 16,
-	baseUrl: './js/lib',
-	paths: {
-		'jquery': 'http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min',
-		'dotlayer': '../../dotlayer',
-		'three': 'http://amenadiel.github.io/google-maps-api-dotlayer/js/lib/three',
-		'dat.gui': 'http://amenadiel.github.io/google-maps-api-dotlayer/js/lib/dat.gui'
-	},
-});    
+        for (var repetition = 0; repetition < pointquantity; repetition++) {
+            var randomlat = desiredboundary.latmin + 1 * desiredboundary.latdif * Math.random() / 3,
+                randomlng = desiredboundary.lngmin + 1 * desiredboundary.lngdif * Math.random() / 3;
+
+            pointArray.push(new google.maps.LatLng(randomlat, randomlng));
+        }
+        document.getElementById('message').innerHTML = 'Generated ' + pointquantity + ' random points.';
+
+        createDotlayer();
+    }
 
 
 
-var mymap,  
-	heatmap,
-	dotlayer,
-	pointArray = new google.maps.MVCArray();
 
 
-					
-	function initialize() {
-	var mapOptions = {
-		zoom: 13,
-		center: new google.maps.LatLng(37.774546, -122.433523),
-		mapTypeId: google.maps.MapTypeId.SATELLITE
-		};
+    google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+</head>
 
-		mymap = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-		google.maps.event.addListener(mymap, 'idle', function () { 
-			console.log('mapped up and good to go');
-			// Generate a desired boundary in the center ninth of the map
-			
-			
-	});	
-		
-}
-	function generatePoints() {
-		var pointquantity=document.getElementById('pointquantity').value;
-		
-		var desiredboundary = {};
-			desiredboundary.lngdif = mymap.getBounds().getNorthEast().lng() - mymap.getBounds().getSouthWest().lng();
-			desiredboundary.latdif = mymap.getBounds().getNorthEast().lat() - mymap.getBounds().getSouthWest().lat();
-			desiredboundary.latmin=mymap.getBounds().getSouthWest().lat() + desiredboundary.latdif/3
-			desiredboundary.lngmin= mymap.getBounds().getSouthWest().lng() + desiredboundary.lngdif/3
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <h4>This map shows how to use DotLayer to display N random points.</h4>
+        </div>
+        <div class="row">
+            <form class="col-md-2 form-horizontal" role="form" style="padding:20px;">
+                <div class="form-group">
+                    <b>1.- Chose Point quantity: </b>
+                    <div class="input-group">
+                        <input type="text" id="pointquantity" class="form-control" value="1000">
+                        <span class="input-group-btn">
+                                <button class="btn btn-default"  onclick="generatePoints()" type="button">Go!</button>
+                            </span>
+                    </div>
+            </form>
+            <p><b>2.- Chose representation method </b></p>
+            <p>
+                <label>Dot Layer
+                    <button class="btn btn-default" onclick="createDotlayer()" type="button">Toggle Dotlayer</button>
+                </label>
+            </p>
+            <div id="message"></div>
+            <div id="dotlayer_controls"></div>
+            <div id="dotlayer_msg">
+                <p></p>
+            </div>
+            </div>
+            <div class="col-md-10">
+                <div id="map-canvas"></div>
+            </div>
+        </div>
+        <div class="row">&nbsp;</div>
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <pre style="border:1px solid #CCC;background:'#F0F0F0';padding:2px">
+    &lt;script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&key=AIzaSyAvBQ1Q9FjYfxdWJF6KPmO822RMMbY2w2o"&gt;&lt;/script&gt;
+    &lt;script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"&gt;&lt;/script&gt;
+    &lt;script src="lib/three.js"&gt;&lt;/script&gt;
+    &lt;script src="lib/dat.gui.js"&gt;&lt;/script&gt;
+    &lt;script src="dotlayer.js"&gt;&lt;/script&gt;
 
-			
-			for (var repetition = 0; repetition < pointquantity; repetition++) {
-				var randomlat=desiredboundary.latmin + 1*desiredboundary.latdif * Math.random()/3,
-				randomlng=desiredboundary.lngmin + 1*desiredboundary.lngdif * Math.random()/3;
 
-				pointArray.push(new google.maps.LatLng(randomlat,randomlng ));
-			}
-			document.getElementById('message').innerHTML='Generated '+pointquantity+' random points.';
-	}
-	
-	function toggleHeatmap() {
-		if(heatmap && heatmap.constructor===google.maps.visualization.HeatmapLayer) {
-			heatmap.setMap(heatmap.getMap() ? null : mymap);	
-		} else {
-			heatmap = new google.maps.visualization.HeatmapLayer({
-				data: pointArray,
-				map: mymap
-			});
-		}
-		
-	}
 
-	function createDotlayer() {
-		if(dotlayer && dotlayer instanceof google.maps.DotLayer) {
-			dotlayer.setMap(dotlayer.getMap() ? null : mymap);	
-		} else {
-			console.log(dotlayer,'not constructed');
-			require( ["jquery", "dotlayer"],   function(jQuery, DotLayer) {
-				heatmap && heatmap.setMap(null);
-				dotlayer = new google.maps.DotLayer({
-					map: mymap,
-					container: '#dotlayer_controls',
-					controlbox: true,
-					DataSet: pointArray
-				});
-				jQuery('#dotlayer_msg').fadeIn('slow').html('<p>&nbsp;</p><p>Go ahead. Zoom and play with the controls!</p>');
-			});
-		}
-	}
-					 
+    var mymap,  
+        heatmap,
+        dotlayer,
+        pointArray = new google.maps.MVCArray();
 
-	google.maps.event.addDomListener(window, 'load', initialize);
+
+                        
+        function initialize() {
+        var mapOptions = {
+            zoom: 13,
+            center: new google.maps.LatLng(37.774546, -122.433523),
+            mapTypeId: google.maps.MapTypeId.SATELLITE
+            };
+
+            mymap = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+            google.maps.event.addListener(mymap, 'idle', function () { 
+                console.log('mapped up and good to go');
+                // Generate a desired boundary in the center ninth of the map
+                
+                
+        }); 
+            
+    }
+
+    function createDotlayer() {
+        if(dotlayer && dotlayer instanceof google.maps.DotLayer) {
+            dotlayer.setMap(dotlayer.getMap() ? null : mymap);  
+        } else {
+            console.log(dotlayer,'not constructed');
+            require( ["jquery", "dotlayer"],   function(jQuery, DotLayer) {
+                heatmap && heatmap.setMap(null);
+                dotlayer = new google.maps.DotLayer({
+                    map: mymap,
+                    container: '#dotlayer_controls',
+                    controlbox: true,
+                    DataSet: pointArray
+                });
+                jQuery('#dotlayer_msg')
+                    .fadeIn('slow')
+                    .find('p')
+                    .html('Go ahead. Zoom and play with the controls!');
+            });
+        }
+    }
+
+    function generatePoints() {
+        var pointquantity=document.getElementById('pointquantity').value;
+        
+        var desiredboundary = {};
+            desiredboundary.lngdif = mymap.getBounds().getNorthEast().lng() - mymap.getBounds().getSouthWest().lng();
+            desiredboundary.latdif = mymap.getBounds().getNorthEast().lat() - mymap.getBounds().getSouthWest().lat();
+            desiredboundary.latmin=mymap.getBounds().getSouthWest().lat() + desiredboundary.latdif/3
+            desiredboundary.lngmin= mymap.getBounds().getSouthWest().lng() + desiredboundary.lngdif/3
+
+            
+            for (var repetition = 0; repetition < pointquantity; repetition++) {
+                var randomlat=desiredboundary.latmin + 1*desiredboundary.latdif * Math.random()/3,
+                randomlng=desiredboundary.lngmin + 1*desiredboundary.lngdif * Math.random()/3;
+
+                pointArray.push(new google.maps.LatLng(randomlat,randomlng ));
+            }
+            document.getElementById('message').innerHTML='Generated '+pointquantity+' random points.';
+            createDotlayer();
+    }
+    
+
+
+
+                     
+
+    google.maps.event.addDomListener(window, 'load', initialize);
 &lt;/script&gt;
-				</pre>
-			</div>
-		</div>
-		<div class="col-md-1"></div>
-	</div>
-	</body>
+                </pre>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+    <script src="dotlayer.js"></script>
+</body>
+
 </html>

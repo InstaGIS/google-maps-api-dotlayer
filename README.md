@@ -14,7 +14,7 @@ It has dependencies on
 * [Require.js](http://requirejs.org/)
 
 
-**Whant to try it out? [Here's a demo!](http://amenadiel.github.io/google-maps-api-dotlayer/demo.html)**
+**Whant to try it out? [Here's a demo!](https://instagis.github.io/google-maps-api-dotlayer/demo.html)**
 
 ## What does it do? 
 
@@ -48,7 +48,7 @@ If your collection doesn't have a  *loadPoints* method, then DotLayer will try t
 
 ## Installation and Usage
 
-Just grab dotlayer.js from this repo and put it somewhere in you js dir. In my case, as you can see in [the demo](http://amenadiel.github.io/google-maps-api-dotlayer/demo.html), I keep the third party libraries in /js/lib and dotlayer in the root folder. You can use it how it suites you most.
+Just grab dotlayer.js from this repo and put it somewhere in you js dir. In my case, as you can see in [the demo](http://instagis.github.io/google-maps-api-dotlayer/demo.html), I keep the third party libraries in /js/lib and dotlayer in the root folder. You can use it how it suites you most.
 
 That, or just clone the gh-pages branch which contain a directory structure already.
 
