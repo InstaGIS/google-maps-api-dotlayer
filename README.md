@@ -13,7 +13,6 @@ It has dependencies on
 * [Dat.GUI](https://code.google.com/p/dat-gui/)
 * [Require.js](http://requirejs.org/)
 
-
 **Whant to try it out? [Here's a demo!](https://instagis.github.io/google-maps-api-dotlayer/demo.html)**
 
 ## What does it do? 
